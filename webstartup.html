@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+	    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+        <script type="text/javascript" charset="utf-8" src="/js/webstartup.js"></script>
+    </head>
+	<body>
+		<div id="navigator-toolbox">
+			<div class="webstartup-toolbar" context="toolbar-context-menu" hidden="false" persist="hidden">
+<!--			<textbox tooltiptext="Webstartup Info" id="wsinfo" editable="true" clickSelectsAll="true" minwidth="100" width="175" hidden="true"/> -->
+				<span id="ws_pagerank" onclick="" label=": n/a" title="Google PageRank: n/a" class="ws-normaltb"><img src="images/google.png" /></span>
+				<span id="ws_alexa" onclick="WebStartup.openLink('alexa')" label=": n/a" title="Alexa Rank: n/a" class="ws-normaltb"><img src="images/alexa.ico"</span>
+<!--			<toolbarseparator id="ws_sep_ranks"/> -->
+
+                <span class="divider"></span>&nbsp;
+
+				<span id="ws_compete" onclick="WebStartup.openLink('compete')" label=": n/a" title="Compete, Monthly Uniques: n/a" class="ws-normaltb"><img src="images/compete.png"</span>
+				<span id="ws_quantcast" onclick="WebStartup.openLink('quantcast')" label=" : n/a" title="Quantcast, Monthly Uniques: n/a" class="ws-normaltb"><img src="images/quantcast.png"></span>
+<!--			<toolbarseparator id="ws_sep_uniqs"/> -->
+
+                <span class="divider"></span>&nbsp;
+
+				<span id="ws_googlebl" onclick="WebStartup.openLink('googlebl')" label=": n/a" title="Google Backlinks: n/a" class="ws-normaltb"/><img src="images/google.png"></span>
+				<span id="ws_bingbl" onclick="WebStartup.openLink('bingbl')" label=": n/a" title="Bing Backlinks: n/a" class="ws-normaltb"/><img src="images/bing.ico"></span> 
+				<span id="ws_yahoobl" onclick="WebStartup.openLink('yahoobl')" label=": n/a" title="Yahoo Backlinks: n/a" class="ws-normaltb"/><img src="images/yahoos.png"></span> 
+<!--			<toolbarseparator id="ws_sep_backlinks"/> -->
+
+                <span class="divider"></span>&nbsp;
+	
+				<span id="ws_linkedin" onclick="WebStartup.openLink('linkedin')" label=": n/a" title="LinkedIn: n/a" class="ws-normaltb"/><img src="images/linkedin.png"></span>
+<!--			<toolbarseparator id="ws_sep_linkedin"/> -->
+
+                <span class="divider"></span>&nbsp;
+
+				<span id="ws_crunchbase" onclick="WebStartup.openLink('crunchbase')" label=": n/a" title="CrunchBase: n/a" class="ws-normaltb"/><img src="images/crunchbase.png"</span>
+<!--			<toolbarseparator id="ws_sep_crunchbase"/> -->
+
+                <span class="divider"></span>&nbsp;
+
+				<span id="ws_reload_data" onclick="WebStartup.reloadData();" label="Reload" title="Reload/Update the data of the Webstartup Toolbar" class="ws-normaltb"/><image src="images/reload.png"</span>
+<!--			<toolbarseparator  id="ws_sep_tools"/> -->
+
+                <span class="divider"></span>&nbsp;
+
+		   </div>     
+		</div> 	
+	</body>
+</html>
+
+
+<!--
+
+- JS: link toolbar and preferences, and all xmlhttp requests
+
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" orient="vertical">
+	<script type="application/x-javascript" src="chrome://webstartup/content/webstartup.js" />
+
+	<toolbox id="navigator-toolbox">
+		<toolbar toolbarname="Webstartup Toolbar" class="webstartup-toolbar" context="toolbar-context-menu" hidden="false" persist="hidden">
+			<textbox tooltiptext="Webstartup Info" id="wsinfo" editable="true" clickSelectsAll="true" minwidth="100" width="175" hidden="true"/>
+			<toolbarbutton id="ws_pagerank" image="chrome://webstartup/skin/google.png" onclick="" label=": n/a" tooltiptext="Google Pagerank: n/a" class="ws-normaltb"/>
+			<toolbarbutton id="ws_alexa" image="chrome://webstartup/skin/alexa.ico" onclick="WebStartup.openLink('alexa')" label=": n/a" tooltiptext="Alexa Rank: n/a" class="ws-normaltb"/>
+			<toolbarseparator id="ws_sep_ranks"/>
+			<toolbarbutton id="ws_compete" image="chrome://webstartup/skin/compete.png" onclick="WebStartup.openLink('compete')" label=": n/a" tooltiptext="Compete, Monthly Uniques: n/a" class="ws-normaltb"/>
+			<toolbarbutton id="ws_quantcast" image="chrome://webstartup/skin/quantcast.png" onclick="WebStartup.openLink('quantcast')" label=" : n/a" tooltiptext="Quantcast, Monthly Uniques: n/a" class="ws-normaltb"/>
+			<toolbarseparator id="ws_sep_uniqs"/>
+			<toolbarbutton id="ws_googlebl" image="chrome://webstartup/skin/google.png" onclick="WebStartup.openLink('googlebl')" label=": n/a" tooltiptext="Google Backlinks: n/a" class="ws-normaltb"/>
+			<toolbarbutton id="ws_bingbl" image="chrome://webstartup/skin/bing.ico" onclick="WebStartup.openLink('bingbl')" label=": n/a" tooltiptext="Bing Backlinks: n/a" class="ws-normaltb"/>
+			<toolbarbutton id="ws_yahoobl" image="chrome://webstartup/skin/yahoos.png" onclick="WebStartup.openLink('yahoobl')" label=": n/a" tooltiptext="Yahoo Backlinks: n/a" class="ws-normaltb"/>
+			<toolbarseparator id="ws_sep_backlinks"/>
+			<toolbarbutton id="ws_linkedin" image="chrome://webstartup/skin/linkedin.png" onclick="WebStartup.openLink('linkedin')" label=": n/a" tooltiptext="LinkedIn: n/a" class="ws-normaltb"/>
+			<toolbarseparator id="ws_sep_linkedin"/>
+			<toolbarbutton id="ws_crunchbase" image="chrome://webstartup/skin/crunchbase.png" onclick="WebStartup.openLink('crunchbase')" label=": n/a" tooltiptext="CrunchBase: n/a" class="ws-normaltb"/>
+			<toolbarseparator id="ws_sep_crunchbase"/>
+			<toolbarbutton id="ws_reload_data" image="chrome://webstartup/skin/reload.png" onclick="WebStartup.reloadData();" label="Reload" tooltiptext="Reload/Update the data of the Webstartup Toolbar" class="ws-normaltb"/>
+			<toolbarbutton id="ws_tb_settings" image="chrome://webstartup/skin/settings.png" onclick="WebStartup.openSettings();" label="Settings" tooltiptext="Toolbar Settings/Customizations" class="ws-normaltb"/>
+			<toolbarseparator  id="ws_sep_tools"/>
+	   </toolbar>     
+	</toolbox> 
+</overlay>
+
+-->
