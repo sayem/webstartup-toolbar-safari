@@ -1,15 +1,56 @@
 /*
+window.WebStartup = {
+    init: function () {
+        WebStartup.customize();
+        WebStartup.wsdata = new Array();
+        WebStartup.$("browser").addEventListener("pageshow", function (event) {
+            WebStartup.ajaxrank()
+        }, true);		
+        gBrowser.tabContainer.addEventListener("TabSelect", function (event) {
+            WebStartup.resetData();
+            WebStartup.lastURL = 'Trying...';
+            WebStartup.ajaxrank();
+        }, true);			
+    },
+	openlink: function() {
+		$('#ws_alexa').hide();
+	
+	},
+	crap: function() {
 
-Original concept, code, and design for this add-on was adopted from ProbCOMP's WebRank Toolbar:
 
-- https://addons.mozilla.org/af/firefox/addon/webrank-toolbar-pagerank-alexa
-- http://webrankstats.com
-- http://probcomp.com
-
-Sayem Islam
-http://sayemislam.com
-
+	}	
+}
+window.addEventListener("load", WebStartup.init, false);
 */
+
+/*
+- change all label, tooltiptext in webstartup.js
+- getBrowser().selectedTab = getBrowser().addTab('http://www.alexa.com/siteinfo/' + WebStartup.lastURL)
+- preferences
+- do tabselect ---- copy it from the gtoolbar for PageRank, model that and test it --- then keep going
+- gBrowser.tabContainer.addEventListener("TabSelect", function (event) {  **** from gtoolbar
+- CHECK WSINFO AND IF IT'S NEEDED
+
+	const activeTab = safari.self.browserWindow.openTab();
+	var turl = "http://www.sayemislam.com";
+	activeTab.url = turl;
+		
+	var url = safari.application.activeBrowserWindow.activeTab.url;	
+	alert(url);		
+
+	if ($('.ws_alexa').is(':hidden')) {
+		alert('hidden');
+	}
+	
+function getlink() {
+	const activeTab = safari.application.activeBrowserWindow.activeTab;
+	var turl = "http://www.sayemislam.com";
+	activeTab.url = turl;
+}
+*/
+
+
 
 
 window.WebStartup = {
@@ -19,17 +60,23 @@ window.WebStartup = {
         WebStartup.$("browser").addEventListener("pageshow", function (event) {
             WebStartup.ajaxrank()
         }, true);
+		
+
+/*		
         gBrowser.tabContainer.addEventListener("TabSelect", function (event) {
             WebStartup.resetData();
             WebStartup.lastURL = 'Trying...';
             WebStartup.ajaxrank();
         }, true);
+*/		
+	
+	
     },
     getHost: function (url) {
         var host = url.replace(/^https{0,1}:\/\//, '');
         host = host.replace(/^www\./, '');
         host = host.replace(/^www[a-z,0-9,A-Z]\./, '');
-        host = host.replace(/\/.*/, '');
+        host = host.replace(/\/.*/,'');  		
         return host;
     },
     StrToNum: function (Str, Check, Magic) {
@@ -97,7 +144,7 @@ window.WebStartup = {
         return x1 + x2;
     },
     ajaxrank: function () {
-        WebStartup.currUrl = gBrowser.currentURI.spec;
+        WebStartup.currUrl = safari.application.activeBrowserWindow.activeTab.url;
         WebStartup.orgurl = WebStartup.currUrl.split("/");
         WebStartup.currUrl = WebStartup.getHost(WebStartup.currUrl);
         if (WebStartup.orgurl.length > 2) {
@@ -109,8 +156,15 @@ window.WebStartup = {
                 WebStartup.resetData();
                 WebStartup.setData();
                 if (WebStartup.wsdata[WebStartup.currUrl]["pr"] == ': n/a' && !WebStartup.$('ws_pagerank').hidden) {
+
+	// CHANGE, also .hidden			
+	
                     WebStartup.$("ws_pagerank").label = ': n/a';
                     WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: n/a';
+					
+					
+					
+					
                     if (WebStartup.prxmlhttp) WebStartup.prxmlhttp.abort();
                     WebStartup.googleRank();
                 }
@@ -171,6 +225,9 @@ window.WebStartup = {
             WebStartup.wsdata[WebStartup.currUrl]["time"] = new Date().getTime();
             WebStartup.resetData();
             WebStartup.initWSData();
+			
+// check HIDDEN			
+			
             if (!WebStartup.$('ws_pagerank').hidden) WebStartup.googleRank();
             if (!WebStartup.$('ws_alexa').hidden) WebStartup.alexaRank();
             if (!WebStartup.$('ws_compete').hidden) WebStartup.competeRank();
@@ -197,8 +254,13 @@ window.WebStartup = {
         WebStartup.wsdata[WebStartup.currUrl]["crunchbase"] = ': n/a';
     },
     resetData: function () {
+	
+	// CHANGE LABEL
+	
         WebStartup.$("ws_pagerank").label = ': n/a';
         WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: n/a';
+		
+		
         if (WebStartup.prxmlhttp && WebStartup.prxmlhttp.readyState != 4) {
             WebStartup.prxmlhttp.abort();
             delete(WebStartup.prxmlhttp);
@@ -262,6 +324,10 @@ window.WebStartup = {
         }
     },
     setData: function () {
+	
+	// CHANGE LABEL 
+	
+	
         WebStartup.$("ws_pagerank").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["pr"];
         WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: ' + WebStartup.wsdata[WebStartup.currUrl]["pr"];
         WebStartup.$("ws_alexa").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["alexa"];
@@ -291,8 +357,13 @@ window.WebStartup = {
                 pr = pr.substr(0, pr.length - 1);
                 if (WebStartup.isInt(pr)) pr = pr + '/10';
                 else pr = 'n/a';
+				
+		// CHANGE LABEL, ALSO CHECK WSINFO		
+				
                 WebStartup.$("ws_pagerank").label = ': ' + pr;
                 WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: ' + pr;
+				
+				
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["pr"] = pr;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'a';
             }
@@ -608,6 +679,11 @@ window.WebStartup = {
     },
     openLink: function (url_path) {
         if (WebStartup.workingURL && WebStartup.lastURL != 'Trying...') {
+		
+		
+		// ADD TAB AND SELECTED TAB
+
+		
             if (url_path == 'alexa') getBrowser().selectedTab = getBrowser().addTab('http://www.alexa.com/siteinfo/' + WebStartup.lastURL);
             else if (url_path == 'compete') getBrowser().selectedTab = getBrowser().addTab('http://siteanalytics.compete.com/' + WebStartup.lastURL);
             else if (url_path == 'quantcast') getBrowser().selectedTab = getBrowser().addTab('http://www.quantcast.com/' + WebStartup.lastURL);
@@ -626,6 +702,9 @@ window.WebStartup = {
         }
     },
     customize: function (opt) {
+	
+	// PREFERENCES
+	
         var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("extensions.webstartup.");
         var locUpdateTime = prefs.getIntPref("updatetime");
         if (locUpdateTime >= 1 && locUpdateTime <= 24) WebStartup.updateTime = locUpdateTime * 3600000;
@@ -678,7 +757,7 @@ window.WebStartup = {
         return true;
     },
     reloadData: function () {
-        var tempUrl = gBrowser.currentURI.spec;
+        var tempUrl = safari.application.activeBrowserWindow.activeTab.url;
         var tempOrgurl = tempUrl.split("/");
         tempUrl = WebStartup.getHost(tempUrl);
         if (tempOrgurl.length > 2) {
