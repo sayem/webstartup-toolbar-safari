@@ -1,82 +1,65 @@
 /*
-window.WebStartup = {
-    init: function () {
-        WebStartup.customize();
-        WebStartup.wsdata = new Array();
-        WebStartup.$("browser").addEventListener("pageshow", function (event) {
-            WebStartup.ajaxrank()
-        }, true);		
-        gBrowser.tabContainer.addEventListener("TabSelect", function (event) {
-            WebStartup.resetData();
-            WebStartup.lastURL = 'Trying...';
-            WebStartup.ajaxrank();
-        }, true);			
-    },
-	openlink: function() {
-		$('#ws_alexa').hide();
-	
-	},
-	crap: function() {
+window.addEventListener("load", loaded, false);
+safari.self.tab.dispatchMessage("somethinghappened","load");
+ 
+$().ready(function() {
+	if (window.top.location == window.location) {
+		WebStartup.init();	
+	}
+});
 
-
-	}	
-}
-window.addEventListener("load", WebStartup.init, false);
+safari.application.activeBrowserWindow.addEventListener("load", WebStartup.init, false);
 */
+
+// safari.application.activeBrowserWindow.addEventListener("click", WebStartup.init, false);
+// safari.self.browserWindow.addEventListener("command", myCommandHandler, false);
 
 /*
-- change all label, tooltiptext in webstartup.js
-- getBrowser().selectedTab = getBrowser().addTab('http://www.alexa.com/siteinfo/' + WebStartup.lastURL)
-- preferences
-- do tabselect ---- copy it from the gtoolbar for PageRank, model that and test it --- then keep going
+http://stackoverflow.com/questions/3541955/safari-5-extension-how-can-i-detect-when-a-windows-current-tab-has-changed
+
+- need to do window.addeventlistener and then message maybe, just like greader
+- check and debug entire script with alerts and make ajaxrank and labels work
+- then test out all funcs before working on TabSelect feature (model greader toolbar, pagerank)
+- check back on dividers and settings/prefs, make hide/show work --- maybe remove and append to instead; maybe do
+it on preferences and loading to put and remove elements instead
 - gBrowser.tabContainer.addEventListener("TabSelect", function (event) {  **** from gtoolbar
-- CHECK WSINFO AND IF IT'S NEEDED
+- check wsinfo and maybe take out all elem $("browser") get elementbyid
 
-	const activeTab = safari.self.browserWindow.openTab();
-	var turl = "http://www.sayemislam.com";
-	activeTab.url = turl;
-		
-	var url = safari.application.activeBrowserWindow.activeTab.url;	
-	alert(url);		
+function check(url_path) {
 
-	if ($('.ws_alexa').is(':hidden')) {
-		alert('hidden');
-	}
-	
-function getlink() {
-	const activeTab = safari.application.activeBrowserWindow.activeTab;
-	var turl = "http://www.sayemislam.com";
-	activeTab.url = turl;
+	alert(url_path);
+
+//	safari.self.browserWindow.openTab().url = 'http://www.alexa.com/';
+
 }
 */
 
 
 
-
 window.WebStartup = {
     init: function () {
-        WebStartup.customize();
-        WebStartup.wsdata = new Array();
-        WebStartup.$("browser").addEventListener("pageshow", function (event) {
-            WebStartup.ajaxrank()
-        }, true);
+		WebStartup.wsdata = new Array();
+//		alert('check');
 		
+	
+//        WebStartup.$("browser").addEventListener("pageshow", function (event) {
+		WebStartup.ajaxrank();
+//        }, true);
 
-/*		
-        gBrowser.tabContainer.addEventListener("TabSelect", function (event) {
+		
+/*
+        gBrowser.tabContainer.addEventListener("TabSelect", function (event) {    ----> put in focus
             WebStartup.resetData();
             WebStartup.lastURL = 'Trying...';
             WebStartup.ajaxrank();
         }, true);
-*/		
-	
-	
+*/			
     },
     getHost: function (url) {
         var host = url.replace(/^https{0,1}:\/\//, '');
         host = host.replace(/^www\./, '');
         host = host.replace(/^www[a-z,0-9,A-Z]\./, '');
-        host = host.replace(/\/.*/,'');  		
+        host = host.replace(/\/.*/,'');
         return host;
     },
     StrToNum: function (Str, Check, Magic) {
@@ -142,7 +125,7 @@ window.WebStartup = {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         return x1 + x2;
-    },
+    },	
     ajaxrank: function () {
         WebStartup.currUrl = safari.application.activeBrowserWindow.activeTab.url;
         WebStartup.orgurl = WebStartup.currUrl.split("/");
@@ -150,69 +133,63 @@ window.WebStartup = {
         if (WebStartup.orgurl.length > 2) {
             if (WebStartup.wsdata[WebStartup.currUrl]) {
                 var currTime = new Date().getTime();
+				WebStartup.updateTime = updateTime;
                 if (currTime - WebStartup.wsdata[WebStartup.currUrl]["time"] > WebStartup.updateTime) delete(WebStartup.wsdata[WebStartup.currUrl]);
             }
             if (WebStartup.wsdata[WebStartup.currUrl] && WebStartup.lastURL != WebStartup.currUrl) {
                 WebStartup.resetData();
-                WebStartup.setData();
-                if (WebStartup.wsdata[WebStartup.currUrl]["pr"] == ': n/a' && !WebStartup.$('ws_pagerank').hidden) {
-
-	// CHANGE, also .hidden			
-	
-                    WebStartup.$("ws_pagerank").label = ': n/a';
-                    WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: n/a';
-					
-					
-					
-					
+                WebStartup.setData();	
+                if (WebStartup.wsdata[WebStartup.currUrl]["pr"] == ': n/a' && !($('#ws_pagerank').is(':hidden'))) {	
+                    $(".ws_pagerank").html(": n/a");
+                    $("#ws_pagerank").attr("title", "Google Pagerank: n/a");					
                     if (WebStartup.prxmlhttp) WebStartup.prxmlhttp.abort();
                     WebStartup.googleRank();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["alexa"] == ': n/a' && !WebStartup.$('ws_alexa').hidden) {
-                    WebStartup.$("ws_alexa").label = ': n/a';
-                    WebStartup.$("ws_alexa").tooltipText = 'Alexa Rank: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["alexa"] == ': n/a' && !($('#ws_alexa').is(':hidden'))) {
+                    $(".ws_alexa").html(": n/a");
+                    $("#ws_alexa").attr("title", "Alexa Rank: n/a");
                     if (WebStartup.alexaxmlhttp) WebStartup.alexaxmlhttp.abort();
                     WebStartup.alexaRank();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["compete"] == ': n/a' && !WebStartup.$('ws_compete').hidden) {
-                    WebStartup.$("ws_compete").label = ': n/a';
-                    WebStartup.$("ws_compete").tooltipText = 'Compete, Monthly Uniques: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["compete"] == ': n/a' && !($('#ws_compete').is(':hidden'))) {
+                    $(".ws_compete").html(": n/a");
+                    $("#ws_compete").attr("title", "Compete, Monthly Uniques: n/a");
                     if (WebStartup.competexmlhttp) WebStartup.competexmlhttp.abort();
                     WebStartup.competeRank();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["quantcast"] == ': n/a' && !WebStartup.$('ws_quantcast').hidden) {
-                    WebStartup.$("ws_quantcast").label = ': n/a';
-                    WebStartup.$("ws_quantcast").tooltipText = 'Quantcast, Monthly Uniques: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["quantcast"] == ': n/a' && !($('#ws_quantcast').is(':hidden'))) {
+                    $(".ws_quantcast").html(": n/a");
+                    $("#ws_quantcast").attr("title", "Quantcast, Monthly Uniques: n/a");
                     if (WebStartup.qcxmlhttp) WebStartup.qcxmlhttp.abort();
                     WebStartup.quantcastRank();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["yahoobl"] == ': n/a' && !WebStartup.$('ws_yahoobl').hidden) {
-                    WebStartup.$("ws_yahoobl").label = ': n/a';
-                    WebStartup.$("ws_yahoobl").tooltipText = 'Yahoo Backlinks: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["yahoobl"] == ': n/a' && !($('#ws_yahoobl').is(':hidden'))) {
+                    $(".ws_yahoobl").html(": n/a");
+                    $("#ws_yahoobl").attr("title", "Yahoo Backlinks: n/a");
                     if (WebStartup.yahooxmlhttp) WebStartup.yahooxmlhttp.abort();
                     WebStartup.yahooBL();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["googlebl"] == ': n/a' && !WebStartup.$('ws_googlebl').hidden) {
-                    WebStartup.$("ws_googlebl").label = ': n/a';
-                    WebStartup.$("ws_googlebl").tooltipText = 'Google Backlinks: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["googlebl"] == ': n/a' && !($('#ws_googlebl').is(':hidden'))) {
+                    $(".ws_googlebl").html(": n/a");
+                    $("#ws_googlebl").attr("title", "Google Backlinks: n/a");
                     if (WebStartup.googleblxmlhttp) WebStartup.googleblxmlhttp.abort();
                     WebStartup.googleBL();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["bingbl"] == ': n/a' && !WebStartup.$('ws_bingbl').hidden) {
-                    WebStartup.$("ws_bingbl").label = ': n/a';
-                    WebStartup.$("ws_bingbl").tooltipText = 'Bing Backlinks: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["bingbl"] == ': n/a' && !($('#ws_bingbl').is(':hidden'))) {
+                    $(".ws_bingbl").html(": n/a");
+                    $("#ws_bingbl").attr("title", "Bing Backlinks: n/a");
                     if (WebStartup.bingblxmlhttp) WebStartup.bingblxmlhttp.abort();
                     WebStartup.bingBL();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["linkedin"] == ': n/a' && !WebStartup.$('ws_linkedin').hidden) {
-                    WebStartup.$("ws_linkedin").label = ': n/a';
-                    WebStartup.$("ws_linkedin").tooltipText = 'LinkedIn: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["linkedin"] == ': n/a' && !($('#ws_linkedin').is(':hidden'))) {
+                    $(".ws_linkedin").html(": n/a");
+                    $("#ws_linkedin").attr("title", "LinkedIn: n/a");
                     if (WebStartup.linkedinxmlhttp) WebStartup.linkedinxmlhttp.abort();
                     WebStartup.linkedinEmp();
                 }
-                if (WebStartup.wsdata[WebStartup.currUrl]["crunchbase"] == ': n/a' && !WebStartup.$('ws_crunchbase').hidden) {
-                    WebStartup.$("ws_crunchbase").label = ': n/a';
-                    WebStartup.$("ws_crunchbase").tooltipText = 'CrunchBase: n/a';
+                if (WebStartup.wsdata[WebStartup.currUrl]["crunchbase"] == ': n/a' && !($('#ws_crunchbase').is(':hidden'))) {
+                    $(".ws_crunchbase").html(": n/a");
+                    $("#ws_crunchbase").attr("title", "CrunchBase: n/a");
                     if (WebStartup.crunchbasexmlhttp) WebStartup.crunchbasexmlhttp.abort();
                     WebStartup.crunchBase();
                 }
@@ -224,19 +201,16 @@ window.WebStartup = {
             WebStartup.wsdata[WebStartup.currUrl] = new Array();
             WebStartup.wsdata[WebStartup.currUrl]["time"] = new Date().getTime();
             WebStartup.resetData();
-            WebStartup.initWSData();
-			
-// check HIDDEN			
-			
-            if (!WebStartup.$('ws_pagerank').hidden) WebStartup.googleRank();
-            if (!WebStartup.$('ws_alexa').hidden) WebStartup.alexaRank();
-            if (!WebStartup.$('ws_compete').hidden) WebStartup.competeRank();
-            if (!WebStartup.$('ws_quantcast').hidden) WebStartup.quantcastRank();
-            if (!WebStartup.$('ws_yahoobl').hidden) WebStartup.yahooBL();
-            if (!WebStartup.$('ws_googlebl').hidden) WebStartup.googleBL();
-            if (!WebStartup.$('ws_bingbl').hidden) WebStartup.bingBL();
-            if (!WebStartup.$('ws_linkedin').hidden) WebStartup.linkedinEmp();  
-            if (!WebStartup.$('ws_crunchbase').hidden) WebStartup.crunchBase();
+            WebStartup.initWSData();			
+            if (!($('ws_pagerank').is(':hidden'))) WebStartup.googleRank();
+            if (!($('ws_alexa').is(':hidden'))) WebStartup.alexaRank();
+            if (!($('ws_compete').is(':hidden'))) WebStartup.competeRank();
+            if (!($('ws_quantcast').is(':hidden'))) WebStartup.quantcastRank();
+            if (!($('ws_yahoobl').is(':hidden'))) WebStartup.yahooBL();
+            if (!($('ws_googlebl').is(':hidden'))) WebStartup.googleBL();
+            if (!($('ws_bingbl').is(':hidden'))) WebStartup.bingBL();
+            if (!($('ws_linkedin').is(':hidden'))) WebStartup.linkedinEmp();  
+            if (!($('ws_crunchbase').is(':hidden'))) WebStartup.crunchBase();
         } else {
             WebStartup.resetData();
             WebStartup.lastURL = "Trying...";
@@ -254,98 +228,89 @@ window.WebStartup = {
         WebStartup.wsdata[WebStartup.currUrl]["crunchbase"] = ': n/a';
     },
     resetData: function () {
-	
-	// CHANGE LABEL
-	
-        WebStartup.$("ws_pagerank").label = ': n/a';
-        WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: n/a';
-		
-		
+        $(".ws_pagerank").html(": n/a");
+        $("#ws_pagerank").attr("title", "Google Pagerank: n/a");		
         if (WebStartup.prxmlhttp && WebStartup.prxmlhttp.readyState != 4) {
             WebStartup.prxmlhttp.abort();
             delete(WebStartup.prxmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["pr"] = ': n/a';
         }
-        WebStartup.$("ws_alexa").label = ': n/a';
-        WebStartup.$("ws_alexa").tooltipText = 'Alexa Rank: n/a';
+        $(".ws_alexa").html(": n/a");
+        $("#ws_alexa").attr("title", "Alexa Rank: n/a");
         if (WebStartup.alexaxmlhttp && WebStartup.alexaxmlhttp.readyState != 4) {
             WebStartup.alexaxmlhttp.abort();
             delete(WebStartup.alexaxmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["alexa"] = ': n/a';
         }
-        WebStartup.$("ws_compete").label = ': n/a';
-        WebStartup.$("ws_compete").tooltipText = 'Compete, Monthly Uniques: n/a';
+        $(".ws_compete").html(": n/a");
+        $("#ws_compete").attr("title", "Compete, Monthly Uniques: n/a");
         if (WebStartup.competexmlhttp && WebStartup.competexmlhttp.readyState != 4) {
             WebStartup.competexmlhttp.abort();
             delete(WebStartup.competexmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["compete"] = ': n/a';
         }
-        WebStartup.$("ws_quantcast").label = ': n/a';
-        WebStartup.$("ws_quantcast").tooltipText = 'Quantcast, Monthly Uniques: n/a';
+        $(".ws_quantcast").html(": n/a");
+        $("#ws_quantcast").attr("title", "Quantcast, Monthly Uniques: n/a");
         if (WebStartup.qcxmlhttp && WebStartup.qcxmlhttp.readyState != 4) {
             WebStartup.qcxmlhttp.abort();
             delete(WebStartup.qcxmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["quantcast"] = ': n/a';
         }
-        WebStartup.$("ws_yahoobl").label = ': n/a';
-        WebStartup.$("ws_yahoobl").tooltipText = 'Yahoo Backlinks: n/a';
+        $(".ws_yahoobl").html(": n/a");
+        $("#ws_yahoobl").attr("title", "Yahoo Backlinks: n/a");
         if (WebStartup.yahooxmlhttp && WebStartup.yahooxmlhttp.readyState != 4) {
             WebStartup.yahooxmlhttp.abort();
             delete(WebStartup.yahooxmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["yahoobl"] = ': n/a';
         }
-        WebStartup.$("ws_googlebl").label = ': n/a';
-        WebStartup.$("ws_googlebl").tooltipText = 'Google Backlinks: n/a';
+        $(".ws_googlebl").html(": n/a");
+        $("#ws_googlebl").attr("title", "Google Backlinks: n/a");
         if (WebStartup.googleblxmlhttp && WebStartup.googleblxmlhttp.readyState != 4) {
             WebStartup.googleblxmlhttp.abort();
             delete(WebStartup.googleblxmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["googlebl"] = ': n/a';
         }
-        WebStartup.$("ws_bingbl").label = ': n/a';
-        WebStartup.$("ws_bingbl").tooltipText = 'Bing Backlinks: n/a';
+        $(".ws_bingbl").html(": n/a");
+        $("#ws_bingbl").attr("title", "Bing Backlinks: n/a");
         if (WebStartup.bingblxmlhttp && WebStartup.bingblxmlhttp.readyState != 4) {
             WebStartup.bingblxmlhttp.abort();
             delete(WebStartup.bingblxmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["bingbl"] = ': n/a';
         }
-        WebStartup.$("ws_linkedin").label = ': n/a';
-        WebStartup.$("ws_linkedin").tooltipText = 'LinkedIn: n/a';
+        $(".ws_linkedin").html(": n/a");
+        $("#ws_linkedin").attr("title", "LinkedIn: n/a");
         if (WebStartup.linkedinxmlhttp && WebStartup.linkedinxmlhttp.readyState != 4) {
             WebStartup.linkedinxmlhttp.abort();
             delete(WebStartup.linkedinxmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["linkedin"] = ': n/a';
         }
-        WebStartup.$("ws_crunchbase").label = ': n/a';
-        WebStartup.$("ws_crunchbase").tooltipText = 'CrunchBase: n/a';
+        $(".ws_crunchbase").html(": n/a");
+        $("#ws_crunchbase").attr("title", "CrunchBase: n/a");
         if (WebStartup.crunchbasexmlhttp && WebStartup.crunchbasexmlhttp.readyState != 4) {
             WebStartup.crunchbasexmlhttp.abort();
             delete(WebStartup.crunchbasexmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["crunchbase"] = ': n/a';
         }
-    },
-    setData: function () {
-	
-	// CHANGE LABEL 
-	
-	
-        WebStartup.$("ws_pagerank").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["pr"];
-        WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: ' + WebStartup.wsdata[WebStartup.currUrl]["pr"];
-        WebStartup.$("ws_alexa").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["alexa"];
-        WebStartup.$("ws_alexa").tooltipText = 'Alexa Rank: ' + WebStartup.wsdata[WebStartup.currUrl]["alexa"];
-        WebStartup.$("ws_compete").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["compete"];
-        WebStartup.$("ws_compete").tooltipText = 'Compete, Monthly Uniques: ' + WebStartup.wsdata[WebStartup.currUrl]["compete"];
-        WebStartup.$("ws_quantcast").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["quantcast"];
-        WebStartup.$("ws_quantcast").tooltipText = 'Quantcast, Monthly Uniques: ' + WebStartup.wsdata[WebStartup.currUrl]["quantcast"];
-        WebStartup.$("ws_googlebl").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["googlebl"];
-        WebStartup.$("ws_googlebl").tooltipText = 'Google Backlinks: ' + WebStartup.wsdata[WebStartup.currUrl]["googlebl"];
-        WebStartup.$("ws_bingbl").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["bingbl"];
-        WebStartup.$("ws_bingbl").tooltipText = 'Bing Backlinks: ' + WebStartup.wsdata[WebStartup.currUrl]["bingbl"];
-        WebStartup.$("ws_yahoobl").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["yahoobl"];
-        WebStartup.$("ws_yahoobl").tooltipText = 'Yahoo Backlinks: ' + WebStartup.wsdata[WebStartup.currUrl]["yahoobl"];
-        WebStartup.$("ws_linkedin").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["linkedin"];
-        WebStartup.$("ws_linkedin").tooltipText = 'LinkedIn: ' + WebStartup.wsdata[WebStartup.currUrl]["linkedin"];
-        WebStartup.$("ws_crunchbase").label = ': ' + WebStartup.wsdata[WebStartup.currUrl]["crunchbase"];
-        WebStartup.$("ws_crunchbase").tooltipText = 'CrunchBase: ' + WebStartup.wsdata[WebStartup.currUrl]["crunchbase"];
+    },	
+    setData: function () {	
+        $(".ws_pagerank").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["pr"]);
+        $("#ws_pagerank").attr("title", 'Google Pagerank: ' + WebStartup.wsdata[WebStartup.currUrl]["pr"]);
+        $(".ws_alexa").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["alexa"]);
+        $("#ws_alexa").attr("title", 'Alexa Rank: ' + WebStartup.wsdata[WebStartup.currUrl]["alexa"]);
+        $(".ws_compete").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["compete"]);
+        $("#ws_compete").attr("title", 'Compete, Monthly Uniques: ' + WebStartup.wsdata[WebStartup.currUrl]["compete"]);
+        $(".ws_quantcast").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["quantcast"]);
+        $("#ws_quantcast").attr("title", 'Quantcast, Monthly Uniques: ' + WebStartup.wsdata[WebStartup.currUrl]["quantcast"]);
+        $(".ws_googlebl").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["googlebl"]);
+        $("#ws_googlebl").attr("title", 'Google Backlinks: ' + WebStartup.wsdata[WebStartup.currUrl]["googlebl"]);
+        $(".ws_bingbl").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["bingbl"]);
+        $("#ws_bingbl").attr("title", 'Bing Backlinks: ' + WebStartup.wsdata[WebStartup.currUrl]["bingbl"]);
+        $(".ws_yahoobl").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["yahoobl"]);
+        $("#ws_yahoobl").attr("title", 'Yahoo Backlinks: ' + WebStartup.wsdata[WebStartup.currUrl]["yahoobl"]);
+        $(".ws_linkedin").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["linkedin"]);
+        $("#ws_linkedin").attr("title", 'LinkedIn: ' + WebStartup.wsdata[WebStartup.currUrl]["linkedin"]);
+        $(".ws_crunchbase").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["crunchbase"]);
+        $("#ws_crunchbase").attr("title", 'CrunchBase: ' + WebStartup.wsdata[WebStartup.currUrl]["crunchbase"]);
     },
     googleRank: function () {
         WebStartup.workingURL = 'http://toolbarqueries.google.com/search?client=navclient-auto&ch=' + WebStartup.CheckHash(WebStartup.HashURL(WebStartup.currUrl)) + '&features=Rank&q=info:' + encodeURIComponent(WebStartup.currUrl) + '&num=100&filter=0';
@@ -358,12 +323,10 @@ window.WebStartup = {
                 if (WebStartup.isInt(pr)) pr = pr + '/10';
                 else pr = 'n/a';
 				
-		// CHANGE LABEL, ALSO CHECK WSINFO		
+		// CHECK WSINFO		
 				
-                WebStartup.$("ws_pagerank").label = ': ' + pr;
-                WebStartup.$("ws_pagerank").tooltipText = 'Google Pagerank: ' + pr;
-				
-				
+                $(".ws_pagerank").html(': ' + pr);
+                $("#ws_pagerank").attr("title", 'Google Pagerank: ' + pr);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["pr"] = pr;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'a';
             }
@@ -386,8 +349,8 @@ window.WebStartup = {
                     if (WebStartup.isInt(rt.substr(start + 6, end - start - 7))) alexa = WebStartup.addCommas(rt.substr(start + 6, end - start - 7));
                     else alexa = 'n/a';
                 }
-                WebStartup.$("ws_alexa").label = ': ' + alexa;
-                WebStartup.$("ws_alexa").tooltipText = 'Alexa Rank: ' + alexa;
+                $(".ws_alexa").html(': ' + alexa);
+                $("#ws_alexa").attr("title", 'Alexa Rank: ' + alexa);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["alexa"] = alexa;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'b';
             }
@@ -415,8 +378,8 @@ window.WebStartup = {
 		    else compete = 'n/a';
 		}
 		else compete = count;
-                WebStartup.$("ws_compete").label = ': ' + compete;
-                WebStartup.$("ws_compete").tooltipText = 'Compete, Monthly Uniques: ' + compete;
+                $(".ws_compete").html(': ' + compete);
+                $("#ws_compete").attr("title", 'Compete, Monthly Uniques: ' + compete);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["compete"] = compete;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'c';
             }
@@ -451,8 +414,8 @@ window.WebStartup = {
 			    quantcast = rt.substr(global + 8, end - global - 8).replace(/^\s+|\s+$/g,"");
 		}      
 		else quantcast = "n/a";
-                WebStartup.$("ws_quantcast").label = ': ' + quantcast;
-                WebStartup.$("ws_quantcast").tooltipText = 'Quantcast, Monthly Uniques: ' + quantcast;
+                $(".ws_quantcast").html(': ' + quantcast);
+                $("#ws_quantcast").attr("title", 'Quantcast, Monthly Uniques: ' + quantcast);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["quantcast"] = quantcast;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'd';
             }
@@ -485,8 +448,8 @@ window.WebStartup = {
                     if (WebStartup.isInt(rt.substr(start + c, end - start - c))) googlebl = rt.substr(start + c, end - start - c);
                     else googlebl = 'n/a';
                 }
-                WebStartup.$("ws_googlebl").label = ': ' + googlebl;
-                WebStartup.$("ws_googlebl").tooltipText = 'Google Backlinks: ' + googlebl;
+                $(".ws_googlebl").html(': ' + googlebl);
+                $("#ws_googlebl").attr("title", 'Google Backlinks: ' + googlebl);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["googlebl"] = googlebl;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'e';
             }
@@ -508,8 +471,8 @@ window.WebStartup = {
                     if (WebStartup.isInt(rt.substr(start + 3, end - start - 3))) bingbl = rt.substr(start + 3, end - start - 3);
                     else bingbl = 'n/a';
                 }
-                WebStartup.$("ws_bingbl").label = ': ' + bingbl;
-                WebStartup.$("ws_bingbl").tooltipText = 'Bing Backlinks: ' + bingbl;
+                $(".ws_bingbl").html(': ' + bingbl);
+                $("#ws_bingbl").attr("title", 'Bing Backlinks: ' + bingbl);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["bingbl"] = bingbl;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'f';
             }
@@ -531,8 +494,8 @@ window.WebStartup = {
                     if (WebStartup.isInt(rt.substr(start + 9, end - start - 9))) yahooind = rt.substr(start + 9, end - start - 9);
                     else yahooind = 'n/a';
                 }
-                WebStartup.$("ws_yahoobl").label = ': ' + yahooind;
-                WebStartup.$("ws_yahoobl").tooltipText = 'Yahoo Backlinks: ' + yahooind;
+                $(".ws_yahoobl").html(': ' + yahooind);
+                $("#ws_yahoobl").attr("title", 'Yahoo Backlinks: ' + yahooind);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["yahoobl"] = yahooind;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'g';
             }
@@ -562,8 +525,8 @@ window.WebStartup = {
 			    linkedin = rt.substr(start + 11, end - start - 11) + ' employees';
 		    }
 		}
-                WebStartup.$("ws_linkedin").label = ': ' + linkedin;
-                WebStartup.$("ws_linkedin").tooltipText = 'LinkedIn: ' + linkedin;
+                $(".ws_linkedin").html(': ' + linkedin);
+                $("#ws_linkedin").attr("title", 'LinkedIn: ' + linkedin);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["linkedin"] = linkedin;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'h';
             }
@@ -665,8 +628,8 @@ window.WebStartup = {
 		if (funding && round) var slash = '  /  ';
 		else slash = ' ';
 		crunchbase = founded + comma + acquiredby + date + price + ipo + ipodate + funding + slash + round;
-                WebStartup.$("ws_crunchbase").label = ': ' + crunchbase;
-                WebStartup.$("ws_crunchbase").tooltipText = 'CrunchBase: ' + crunchbase;
+                $(".ws_crunchbase").html(': ' + crunchbase);
+                $("#ws_crunchbase").attr("title", 'CrunchBase: ' + crunchbase);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["crunchbase"] = crunchbase;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'i';
             }
@@ -675,86 +638,26 @@ window.WebStartup = {
         WebStartup.crunchbasexmlhttp.send(null);
     },
     getXmlHttpObject: function () {
-            return new XMLHttpRequest();
+		return new XMLHttpRequest();
     },
     openLink: function (url_path) {
-        if (WebStartup.workingURL && WebStartup.lastURL != 'Trying...') {
-		
-		
-		// ADD TAB AND SELECTED TAB
-
-		
-            if (url_path == 'alexa') getBrowser().selectedTab = getBrowser().addTab('http://www.alexa.com/siteinfo/' + WebStartup.lastURL);
-            else if (url_path == 'compete') getBrowser().selectedTab = getBrowser().addTab('http://siteanalytics.compete.com/' + WebStartup.lastURL);
-            else if (url_path == 'quantcast') getBrowser().selectedTab = getBrowser().addTab('http://www.quantcast.com/' + WebStartup.lastURL);
-            else if (url_path == 'googlebl') getBrowser().selectedTab = getBrowser().addTab('http://www.google.com/search?hl=en&filter=0&lr=&ie=UTF-8&q=link:' + WebStartup.lastURL + '&filter=0');
-            else if (url_path == 'bingbl') getBrowser().selectedTab = getBrowser().addTab('http://www.bing.com/search?q=inbody:' + WebStartup.lastURL + '+-site:' + WebStartup.lastURL);
-            else if (url_path == 'yahoobl') getBrowser().selectedTab = getBrowser().addTab('http://siteexplorer.search.yahoo.com/siteexplorer/search?bwm=i&bwmo=d&bwmf=u&p=' + WebStartup.lastURL);
-	    else if (url_path == 'linkedin') {
-		if (WebStartup.lastURL.split('.')[1] in {'com':'', 'net':'', 'org':'', 'gov':'', 'edu':''}) getBrowser().selectedTab = getBrowser().addTab('http://www.linkedin.com/company/' + WebStartup.lastURL.split('.')[0]);
-		else getBrowser().selectedTab = getBrowser().addTab('http://www.linkedin.com/company/' + WebStartup.lastURL);
-	    }
-	    else if (url_path == 'crunchbase') {
-		if (WebStartup.lastURL.split('.')[1] in {'com':'', 'net':'', 'org':'', 'gov':'', 'edu':''}) getBrowser().selectedTab = getBrowser().addTab('http://www.crunchbase.com/company/' + WebStartup.lastURL.split('.')[0]);
-	        else getBrowser().selectedTab = getBrowser().addTab('http://www.crunchbase.com/company/' + WebStartup.lastURL.split('.')[0] + '-' + WebStartup.lastURL.split('.')[1]);
-	    }
-            else getBrowser().selectedTab = getBrowser().addTab('');
+        if (WebStartup.workingURL && WebStartup.lastURL != 'Trying...') {			
+            if (url_path == 'alexa') safari.self.browserWindow.openTab().url = 'http://www.alexa.com/siteinfo/' + WebStartup.lastURL;			
+            else if (url_path == 'compete') safari.self.browserWindow.openTab().url = 'http://siteanalytics.compete.com/' + WebStartup.lastURL;			
+            else if (url_path == 'quantcast') safari.self.browserWindow.openTab().url = 'http://www.quantcast.com/' + WebStartup.lastURL;
+            else if (url_path == 'googlebl') safari.self.browserWindow.openTab().url = 'http://www.google.com/search?hl=en&filter=0&lr=&ie=UTF-8&q=link:' + WebStartup.lastURL + '&filter=0';
+            else if (url_path == 'bingbl') safari.self.browserWindow.openTab().url = 'http://www.bing.com/search?q=inbody:' + WebStartup.lastURL + '+-site:' + WebStartup.lastURL;
+            else if (url_path == 'yahoobl') safari.self.browserWindow.openTab().url = 'http://siteexplorer.search.yahoo.com/siteexplorer/search?bwm=i&bwmo=d&bwmf=u&p=' + WebStartup.lastURL;	
+			else if (url_path == 'linkedin') {
+				if (WebStartup.lastURL.split('.')[1] in {'com':'', 'net':'', 'org':'', 'gov':'', 'edu':''}) safari.self.browserWindow.openTab().url = 'http://www.linkedin.com/company/' + WebStartup.lastURL.split('.')[0];
+				else safari.self.browserWindow.openTab().url = 'http://www.linkedin.com/company/' + WebStartup.lastURL;
+			}
+			else if (url_path == 'crunchbase') {
+				if (WebStartup.lastURL.split('.')[1] in {'com':'', 'net':'', 'org':'', 'gov':'', 'edu':''}) safari.self.browserWindow.openTab().url = 'http://www.crunchbase.com/company/' + WebStartup.lastURL.split('.')[0];
+				else safari.self.browserWindow.openTab().url = 'http://www.crunchbase.com/company/' + WebStartup.lastURL.split('.')[0] + '-' + WebStartup.lastURL.split('.')[1];
+			}
+            else safari.self.browserWindow.openTab().url = '';			
         }
-    },
-    customize: function (opt) {
-	
-	// PREFERENCES
-	
-        var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("extensions.webstartup.");
-        var locUpdateTime = prefs.getIntPref("updatetime");
-        if (locUpdateTime >= 1 && locUpdateTime <= 24) WebStartup.updateTime = locUpdateTime * 3600000;
-        else WebStartup.updateTime = 3600000;
-        WebStartup.$('ws_pagerank').hidden = !(prefs.getBoolPref("pagerank"));
-        WebStartup.$('ws_alexa').hidden = !(prefs.getBoolPref("alexa"));
-        if (WebStartup.$('ws_pagerank').hidden && WebStartup.$('ws_alexa').hidden) {
-            WebStartup.$('ws_sep_ranks').hidden = true;
-        } else {
-            WebStartup.$('ws_sep_ranks').hidden = false;
-        }
-        WebStartup.$('ws_compete').hidden = !(prefs.getBoolPref("compete"));
-        WebStartup.$('ws_quantcast').hidden = !(prefs.getBoolPref("quantcast"));
-        if (WebStartup.$('ws_compete').hidden && WebStartup.$('ws_quantcast').hidden) {
-            WebStartup.$('ws_sep_uniqs').hidden = true;
-        } else {
-            WebStartup.$('ws_sep_uniqs').hidden = false;
-        }
-        WebStartup.$('ws_googlebl').hidden = !(prefs.getBoolPref("googlebl"));
-        WebStartup.$('ws_bingbl').hidden = !(prefs.getBoolPref("bingbl"));
-        WebStartup.$('ws_yahoobl').hidden = !(prefs.getBoolPref("yahoobl"));
-        if (WebStartup.$('ws_googlebl').hidden && WebStartup.$('ws_bingbl').hidden && WebStartup.$('ws_yahoobl').hidden) {
-            WebStartup.$('ws_sep_backlinks').hidden = true;
-        } else {
-            WebStartup.$('ws_sep_backlinks').hidden = false;
-        }
-        WebStartup.$('ws_linkedin').hidden = !(prefs.getBoolPref("linkedin"));
-        if (WebStartup.$('ws_linkedin').hidden) {
-            WebStartup.$('ws_sep_linkedin').hidden = true;
-	} else { 
-	    WebStartup.$('ws_sep_linkedin').hidden = false;
-	}
-        WebStartup.$('ws_crunchbase').hidden = !(prefs.getBoolPref("crunchbase"));
-        if (WebStartup.$('ws_crunchbase').hidden) {
-            WebStartup.$('ws_sep_crunchbase').hidden = true;
-	} else { 
-	    WebStartup.$('ws_sep_crunchbase').hidden = false;
-	}
-        WebStartup.$('ws_tb_settings').hidden = !(prefs.getBoolPref("showsettings"));
-        WebStartup.$('ws_reload_data').hidden = !(prefs.getBoolPref("reload"));
-        if (WebStartup.$('ws_tb_settings').hidden && WebStartup.$('ws_reload_data').hidden) {
-            WebStartup.$('ws_sep_tools').hidden = true;
-        } else {
-            WebStartup.$('ws_sep_tools').hidden = false;
-        }
-        if (opt == 1) {
-            WebStartup.lastURL = "Trying...";
-            WebStartup.ajaxrank();
-        }
-        return true;
     },
     reloadData: function () {
         var tempUrl = safari.application.activeBrowserWindow.activeTab.url;
@@ -763,6 +666,7 @@ window.WebStartup = {
         if (tempOrgurl.length > 2) {
             if (WebStartup.wsdata[tempUrl]) {
                 var currTime = new Date().getTime();
+				WebStartup.updateTime = updateTime;
                 WebStartup.wsdata[tempUrl]["time"] = currTime - WebStartup.updateTime - 1;
             }
             WebStartup.ajaxrank();
@@ -772,12 +676,7 @@ window.WebStartup = {
         if (num.toString().search(/^-?[0-9,\.(B)?(M)?(K)?]+$/) == 0) return true;
         else
         return false;
-    },
-    openSettings: function () {
-        window.openDialog('chrome://webstartup/content/options.xul', 'ws_settings', 'chrome,dialog,centerscreen,dependent')
-    },
-    $: function (elem) {
-        return document.getElementById(elem);
-    },
+    }
 }
-window.addEventListener("load", WebStartup.init, false);
+window.addEventListener("focus", WebStartup.init, false);
+window.addEventListener("pageshow", WebStartup.init, false);
