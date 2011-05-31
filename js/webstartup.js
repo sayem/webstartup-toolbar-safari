@@ -17,21 +17,16 @@ safari.application.activeBrowserWindow.addEventListener("load", WebStartup.init,
 /*
 http://stackoverflow.com/questions/3541955/safari-5-extension-how-can-i-detect-when-a-windows-current-tab-has-changed
 
-- need to do window.addeventlistener and then message maybe, just like greader
-- check and debug entire script with alerts and make ajaxrank and labels work
-- then test out all funcs before working on TabSelect feature (model greader toolbar, pagerank)
+
+- need to fix loading/focus on tabs and reloading
+- also fix reload data
+- change links to href so that it looks clickable
+- look into TabSelect 
 - check back on dividers and settings/prefs, make hide/show work --- maybe remove and append to instead; maybe do
 it on preferences and loading to put and remove elements instead
 - gBrowser.tabContainer.addEventListener("TabSelect", function (event) {  **** from gtoolbar
-- check wsinfo and maybe take out all elem $("browser") get elementbyid
+- check wsinfo
 
-function check(url_path) {
-
-	alert(url_path);
-
-//	safari.self.browserWindow.openTab().url = 'http://www.alexa.com/';
-
-}
 */
 
 
@@ -125,7 +120,7 @@ window.WebStartup = {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         return x1 + x2;
-    },	
+    },
     ajaxrank: function () {
         WebStartup.currUrl = safari.application.activeBrowserWindow.activeTab.url;
         WebStartup.orgurl = WebStartup.currUrl.split("/");
@@ -291,7 +286,7 @@ window.WebStartup = {
             delete(WebStartup.crunchbasexmlhttp);
             WebStartup.wsdata[WebStartup.currUrl]["crunchbase"] = ': n/a';
         }
-    },	
+    },
     setData: function () {	
         $(".ws_pagerank").html(': ' + WebStartup.wsdata[WebStartup.currUrl]["pr"]);
         $("#ws_pagerank").attr("title", 'Google Pagerank: ' + WebStartup.wsdata[WebStartup.currUrl]["pr"]);
@@ -359,36 +354,36 @@ window.WebStartup = {
         WebStartup.alexaxmlhttp.send(null);
     },
     competeRank: function () {
-        WebStartup.workingURL = 'view-source:http://data.compete.com/fast-cgi/MI?size=small&ver=3&d=' + encodeURIComponent(WebStartup.currUrl);
+        WebStartup.workingURL = 'http://data.compete.com/fast-cgi/MI?size=small&ver=3&d=' + encodeURIComponent(WebStartup.currUrl);
         WebStartup.competexmlhttp = WebStartup.getXmlHttpObject();
         WebStartup.competexmlhttp.onreadystatechange = function () {
             if (WebStartup.competexmlhttp.readyState == 4 && WebStartup.competexmlhttp.status == 200) {
                 var rt = WebStartup.competexmlhttp.responseText;
-		var start = rt.indexOf('<count');
-		var end = rt.indexOf('</count');
-		var count = rt.substr(start + 7, end - start - 7).replace(/^\s+|\s+$/g,"");
-		var compete;
-		if (count == 0) compete = 'n/a';
-		else if (count.length > 7) {
-		    if (WebStartup.isInt(count.slice(0,-8))) compete = count.slice(0,-8) + 'M';
-		    else compete = 'n/a';
-		}  
-		else if (count.length > 3) {
-		    if (WebStartup.isInt(count.slice(0,-4))) compete = count.slice(0,-4) + 'K';
-		    else compete = 'n/a';
-		}
-		else compete = count;
+				var start = rt.indexOf('<count');
+				var end = rt.indexOf('</count');
+				var count = rt.substr(start + 7, end - start - 7).replace(/^\s+|\s+$/g,"");
+				var compete;
+				if (count == 0) compete = 'n/a';
+				else if (count.length > 7) {
+					if (WebStartup.isInt(count.slice(0,-8))) compete = count.slice(0,-8) + 'M';
+					else compete = 'n/a';
+				}  
+				else if (count.length > 3) {
+					if (WebStartup.isInt(count.slice(0,-4))) compete = count.slice(0,-4) + 'K';
+					else compete = 'n/a';
+				}
+				else compete = count;
                 $(".ws_compete").html(': ' + compete);
                 $("#ws_compete").attr("title", 'Compete, Monthly Uniques: ' + compete);
                 WebStartup.wsdata[encodeURIComponent(WebStartup.currUrl)]["compete"] = compete;
                 WebStartup.$("wsinfo").value = WebStartup.$("wsinfo").value + 'c';
             }
-        };
+        };		
         WebStartup.competexmlhttp.open("GET", WebStartup.workingURL, true);
         WebStartup.competexmlhttp.send(null);
     },
     quantcastRank: function () {
-        WebStartup.workingURL = 'http://www.quantcast.com/' + encodeURIComponent(WebStartup.currUrl);
+        WebStartup.workingURL = 'http://quantcast.com/' + encodeURIComponent(WebStartup.currUrl);
         WebStartup.qcxmlhttp = WebStartup.getXmlHttpObject();
         WebStartup.qcxmlhttp.onreadystatechange = function () {
             if (WebStartup.qcxmlhttp.readyState == 4 && WebStartup.qcxmlhttp.status == 200) {
