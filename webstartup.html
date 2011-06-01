@@ -20,38 +20,33 @@
 		</script>
     </head>
 	<body>
-		<div id="navigator-toolbox">
-			<div class="webstartup-toolbar" context="toolbar-context-menu" hidden="false" persist="hidden">
-<!--			<textbox tooltiptext="Webstartup Info" id="wsinfo" editable="true" clickSelectsAll="true" minwidth="100" width="175" hidden="true"/> -->
-				<span id="ranks">
-					<span id="ws_pagerank" onclick="" title="Google PageRank: n/a" class="ws-normaltb"><img src="images/google.png" /><span class="ws_pagerank"></span></span>
-					<span id="ws_alexa" title="Alexa Rank: n/a" class="ws-normaltb"><img src="images/alexa.ico" /><a href="" class="ws_alexa"></a></span>
-					<span class="divider ranks"></span>
+				<span id="ranks" class="ws-tab">
+					<span id="ws_pagerank" title="Google PageRank: n/a"><img src="images/google.png" /><span class="ws_pagerank"></span></span>
+					<span id="ws_alexa" title="Alexa Rank: n/a"><img src="images/alexa.ico" /><a href="" class="ws_alexa"></a></span>
+					<span class="divider"></span>
 				</span>
-				<span id="uniqs">
-					<span id="ws_compete" title="Compete, Monthly Uniques: n/a" class="ws-normaltb"><img src="images/compete.png" /><a href="" class="ws_compete"></a></span>
-					<span id="ws_quantcast" title="Quantcast, Monthly Uniques: n/a" class="ws-normaltb"><img src="images/quantcast.png" /><a href="" class="ws_quantcast"></a></span>
-					<span class="divider uniqs"></span>
+				<span id="uniqs" class="ws-tab">
+					<span id="ws_compete" title="Compete, Monthly Uniques: n/a"><img src="images/compete.png" /><a href="" class="ws_compete"></a></span>
+					<span id="ws_quantcast" title="Quantcast, Monthly Uniques: n/a"><img src="images/quantcast.png" /><a href="" class="ws_quantcast"></a></span>
+					<span class="divider"></span>
 				</span>
-				<span id="backlinks">
-					<span id="ws_googlebl" title="Google Backlinks: n/a" class="ws-normaltb"/><img src="images/google.png" /><a href="" class="ws_googlebl"></a></span>
-					<span id="ws_bingbl" title="Bing Backlinks: n/a" class="ws-normaltb"/><img src="images/bing.ico" /><a href="" class="ws_bingbl"></a></span> 
-					<span id="ws_yahoobl" title="Yahoo Backlinks: n/a" class="ws-normaltb"/><img src="images/yahoos.png" /><a href="" class="ws_yahoobl"></a></span> 
-					<span class="divider backlinks"></span>	
+				<span id="backlinks" class="ws-tab">
+					<span id="ws_googlebl" title="Google Backlinks: n/a"><img src="images/google.png" /><a href="" class="ws_googlebl"></a></span>
+					<span id="ws_bingbl" title="Bing Backlinks: n/a"><img src="images/bing.ico" /><a href="" class="ws_bingbl"></a></span> 
+					<span id="ws_yahoobl" title="Yahoo Backlinks: n/a"><img src="images/yahoos.png" /><a href="" class="ws_yahoobl"></a></span> 
+					<span class="divider"></span>	
 				</span>
-				<span id="linkedin">
-					<span id="ws_linkedin" title="LinkedIn: n/a" class="ws-normaltb"/><img src="images/linkedin.png" /><a href="" class="ws_linkedin"></a></span>
-					<span class="divider linkedin"></span>
+				<span id="linkedin" class="ws-tab">
+					<span id="ws_linkedin" title="LinkedIn: n/a"><img src="images/linkedin.png" /><a href="" class="ws_linkedin"></a></span>
+					<span class="divider"></span>
 				</span>
-				<span id="crunchbase">
-					<span id="ws_crunchbase" title="CrunchBase: n/a" class="ws-normaltb"/><img src="images/crunchbase.png" /><a href="" class="ws_crunchbase"></a></span>
-					<span class="divider crunchbase"></span>
+				<span id="crunchbase" class="ws-tab">
+					<span id="ws_crunchbase" title="CrunchBase: n/a"><img src="images/crunchbase.png" /><a href="" class="ws_crunchbase"></a></span>
+					<span class="divider"></span>
 				</span>
-				<span id="reload">
-					<span id="ws_reload_data" onclick="WebStartup.init()" title="Reload/Update the data of the Webstartup Toolbar" class="ws-normaltb"><image src="images/reload.png" /></span>
-					<span class="divider tools"></span>
+				<span id="reload" class="ws-tab">
+					<span id="ws_reload_data" onclick="WebStartup.init()" title="Reload/Update the data of the Webstartup Toolbar"><image src="images/reload.png" /><span class="ws_reload">Reload</span></span>
+					<span class="divider"></span>
 				</span>
-		   </div>
-		</div> 	
 	</body>
 </html>

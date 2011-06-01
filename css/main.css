@@ -1,19 +1,31 @@
 
-.divider {
-  border: 1px gray double;
-  border-width: 0px 1px 0px 0px;
-  width: 2px;
-  height: 21px;
-  position: absolute;
-  top: 4px;
+.ws-tab {
+	margin: 0px 5px 0px 4px;	
+	font: 1em arial; 
+	color: black;
 }
 
+a {
+	color: black;
+}
 
-/*
+a:link, .ws_pagerank, .ws_reload {
+	text-decoration: none;
+	position: relative;
+	bottom: 4px;
+	left: 4px;
+	margin-right: 5px;
+}
 
-.webstartup-toolbar toolbarbutton.ws-normaltb{font-size:12px;font-family:arial;margin-left:1px;margin-right:1px;}
-.webstartup-toolbar toolbarbutton.ws-firsttb{font-size:12px;font-family:arial;margin-left:0px;}
-.webstartup-toolbar label.ws-label{font-weight:bold;font-size:12px;font-family:arial;margin-top:6px;margin-left:3px;margin-right:0px;}
-.webstartup-toolbar toolbarbutton.ws-review{font-size:12px;font-family:arial;margin-left:0px;font-weight:100;margin-right:0px;}
+#ws_reload_data {
+	margin-right: 2px;
+}
 
-*/
+.divider {
+	border: 1px gray double;
+	border-width: 0px 1px 0px 0px;
+	width: 2px;
+	height: 21px;
+	position: absolute;
+	top: 4px;	
+}
