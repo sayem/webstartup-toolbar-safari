@@ -33,16 +33,7 @@
 	<key>Content</key>
 	<dict>
 		<key>Scripts</key>
-		<dict>
-			<key>End</key>
-			<array>
-				<string>js/webstartup.js</string>
-			</array>
-		</dict>
-		<key>Stylesheets</key>
-		<array>
-			<string>css/main.css</string>
-		</array>
+		<dict/>
 	</dict>
 	<key>Description</key>
 	<string>Pulls data from Crunchbase, Quantcast, Compete, LinkedIn, and more on any website you're visiting</string>

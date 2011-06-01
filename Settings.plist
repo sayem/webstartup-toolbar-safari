@@ -120,7 +120,7 @@
 		<key>DefaultValue</key>
 		<true/>
 		<key>Key</key>
-		<string>reload</string>
+		<string>reload_data</string>
 		<key>Title</key>
 		<string>Reload option</string>
 		<key>Type</key>
