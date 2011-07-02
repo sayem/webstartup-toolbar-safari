@@ -1,7 +1,7 @@
 Web Startup Toolbar - Safari
 ----------------------------
 
-http://sayemislam.com/webstartup.safariextz
+http://webstartuptoolbar.com/webstartup.safariextz
 
 A toolbar that automatically pulls data from CrunchBase, LinkedIn, Quantcast, Compete, Alexa, Google, Bing, and Yahoo for any website or startup that you're browsing through.
 
