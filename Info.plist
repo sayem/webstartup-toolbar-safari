@@ -4,6 +4,8 @@
 <dict>
 	<key>Author</key>
 	<string>Sayem Islam</string>
+	<key>Builder Version</key>
+	<string>534.50</string>
 	<key>CFBundleDisplayName</key>
 	<string>webstartup</string>
 	<key>CFBundleIdentifier</key>
